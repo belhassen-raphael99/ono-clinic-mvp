@@ -1,56 +1,50 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   Project-specific tokens (in addition to shadcn's tokens).
+   These generate utilities like bg-primary-soft, text-muted-fg, etc.
+   ───────────────────────────────────────────────────────────── */
 @theme {
-  /* Surfaces */
   --color-paper: #FCFCFA;
-  --color-card: #FFFFFF;
-  --color-muted: #F4F4F1;
-  --color-line: #E5E5E0;
-
-  /* Text */
   --color-ink: #1E293B;
+  --color-line: #E5E5E0;
   --color-muted-fg: #64748B;
-
-  /* Brand */
-  --color-primary: #0E7490;
-  --color-primary-fg: #FFFFFF;
   --color-primary-soft: #E0F2F5;
   --color-primary-deep: #0B5C73;
-
-  /* Status */
   --color-success: #16A34A;
   --color-success-soft: #DCFCE7;
   --color-warning: #EAB308;
   --color-warning-soft: #FEF3C7;
-  --color-destructive: #DC2626;
   --color-destructive-soft: #FEE2E2;
 
-  /* Typography — Heebo CSS variable comes from next/font, set on <html> */
-  --font-sans: var(--font-heebo), ui-sans-serif, system-ui, sans-serif;
-
-  /* Elevation */
   --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.04);
   --shadow-lift: 0 10px 15px -3px rgb(15 23 42 / 0.10), 0 4px 6px -4px rgb(15 23 42 / 0.04);
-
-  /* Border radius — overrides Tailwind defaults to match UX spec */
-  --radius-lg: 0.5rem;   /* 8px  — buttons, inputs */
-  --radius-xl: 0.75rem;  /* 12px — cards */
-  --radius-2xl: 1rem;    /* 16px — dialogs */
 }
 
 @layer base {
   body {
-    background-color: var(--color-paper);
-    color: var(--color-ink);
+    @apply bg-background text-foreground;
   }
 
   /* LTR-rendered numerals inside RTL flow.
-     Used in tables for IDs, license numbers, phone numbers, dates. */
+     Used for IDs, license numbers, phone numbers, dates. */
   .num {
     direction: ltr;
     unicode-bidi: isolate;
     display: inline-block;
     font-variant-numeric: tabular-nums;
+  }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
   }
 }
 
@@ -63,4 +57,89 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   shadcn token aliases — generates utilities like bg-primary,
+   bg-card, etc. Each --color-X references the runtime CSS var --X
+   defined in :root, so updating :root cascades to all utilities.
+   ───────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius scale derived from --radius (matches UX spec):
+     md ≈ 6px (badges), lg = 8px (buttons/inputs),
+     xl ≈ 11px (cards), 2xl ≈ 14px (dialogs) */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+/* Project palette — values match the UX preview spec.
+   No dark mode in MVP1; the .dark class block is intentionally absent. */
+:root {
+  --background: #FCFCFA;
+  --foreground: #1E293B;
+  --card: #FFFFFF;
+  --card-foreground: #1E293B;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E293B;
+
+  --primary: #0E7490;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #F4F4F1;
+  --secondary-foreground: #1E293B;
+  --muted: #F4F4F1;
+  --muted-foreground: #64748B;
+  --accent: #E0F2F5;
+  --accent-foreground: #0B5C73;
+
+  --destructive: #DC2626;
+
+  --border: #E5E5E0;
+  --input: #E5E5E0;
+  --ring: #0E7490;
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1E293B;
+  --sidebar-primary: #0E7490;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E0F2F5;
+  --sidebar-accent-foreground: #0B5C73;
+  --sidebar-border: #E5E5E0;
+  --sidebar-ring: #0E7490;
+
+  --radius: 0.5rem;
 }
