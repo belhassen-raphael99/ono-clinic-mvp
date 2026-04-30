@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Surfaces */
+  --color-paper: #FCFCFA;
+  --color-card: #FFFFFF;
+  --color-muted: #F4F4F1;
+  --color-line: #E5E5E0;
+
+  /* Text */
+  --color-ink: #1E293B;
+  --color-muted-fg: #64748B;
+
+  /* Brand */
+  --color-primary: #0E7490;
+  --color-primary-fg: #FFFFFF;
+  --color-primary-soft: #E0F2F5;
+  --color-primary-deep: #0B5C73;
+
+  /* Status */
+  --color-success: #16A34A;
+  --color-success-soft: #DCFCE7;
+  --color-warning: #EAB308;
+  --color-warning-soft: #FEF3C7;
+  --color-destructive: #DC2626;
+  --color-destructive-soft: #FEE2E2;
+
+  /* Typography — Heebo CSS variable comes from next/font, set on <html> */
+  --font-sans: var(--font-heebo), ui-sans-serif, system-ui, sans-serif;
+
+  /* Elevation */
+  --shadow-card: 0 1px 3px 0 rgb(15 23 42 / 0.08), 0 1px 2px -1px rgb(15 23 42 / 0.04);
+  --shadow-lift: 0 10px 15px -3px rgb(15 23 42 / 0.10), 0 4px 6px -4px rgb(15 23 42 / 0.04);
+
+  /* Border radius — overrides Tailwind defaults to match UX spec */
+  --radius-lg: 0.5rem;   /* 8px  — buttons, inputs */
+  --radius-xl: 0.75rem;  /* 12px — cards */
+  --radius-2xl: 1rem;    /* 16px — dialogs */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* LTR-rendered numerals inside RTL flow.
+     Used in tables for IDs, license numbers, phone numbers, dates. */
+  .num {
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
