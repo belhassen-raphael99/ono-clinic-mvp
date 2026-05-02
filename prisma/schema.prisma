@@ -1,0 +1,70 @@
+// Ono Clinic MVP — Database schema
+// Documented in CLAUDE.md and the PM plan.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// DOCTOR
+// PK: 5-digit Israeli medical license number (validated at app
+// layer). Name is required; relation to Appointment is one-to-many.
+// ─────────────────────────────────────────────────────────────
+model Doctor {
+  licenseNumber String        @id @map("license_number") @db.VarChar(5)
+  name          String        @db.VarChar(100)
+  appointments  Appointment[]
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt      @map("updated_at")
+
+  @@map("doctors")
+}
+
+// ─────────────────────────────────────────────────────────────
+// PATIENT
+// PK: 9-digit Israeli Teudat Zehut (validated with check-digit at
+// app layer). Phone is Israeli format. One-to-many to Appointment.
+// ─────────────────────────────────────────────────────────────
+model Patient {
+  idNumber     String        @id @map("id_number") @db.VarChar(9)
+  name         String        @db.VarChar(100)
+  phone        String        @db.VarChar(20)
+  appointments Appointment[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt      @map("updated_at")
+
+  @@map("patients")
+}
+
+// ─────────────────────────────────────────────────────────────
+// APPOINTMENT
+// PK: autoincrement number. Stores UTC timestamps; Asia/Jerusalem
+// only at display time. onDelete: Restrict on both FKs blocks
+// deleting a Doctor or Patient that still has appointments.
+// Composite indexes accelerate the 30-min conflict-detection
+// query and the dashboard "upcoming 5" query.
+// ─────────────────────────────────────────────────────────────
+model Appointment {
+  appointmentNumber Int      @id @default(autoincrement()) @map("appointment_number")
+  appointmentDate   DateTime @map("appointment_date") @db.Timestamptz(6)
+  reason            String   @db.VarChar(500)
+  doctorLicense     String   @map("doctor_license") @db.VarChar(5)
+  patientId         String   @map("patient_id")     @db.VarChar(9)
+
+  doctor  Doctor  @relation(fields: [doctorLicense], references: [licenseNumber], onDelete: Restrict, onUpdate: Cascade)
+  patient Patient @relation(fields: [patientId],     references: [idNumber],      onDelete: Restrict, onUpdate: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@index([doctorLicense, appointmentDate])
+  @@index([patientId, appointmentDate])
+  @@index([appointmentDate])
+  @@map("appointments")
+}
