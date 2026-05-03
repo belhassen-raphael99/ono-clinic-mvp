@@ -106,8 +106,9 @@
   --radius-3xl: calc(var(--radius) * 2.2);
 }
 
-/* Project palette — values match the UX preview spec.
-   No dark mode in MVP1; the .dark class block is intentionally absent. */
+/* ─────────────────────────────────────────────────────────────
+   Light palette — matches UX preview spec.
+   ───────────────────────────────────────────────────────────── */
 :root {
   --background: #FCFCFA;
   --foreground: #1E293B;
@@ -142,4 +143,42 @@
   --sidebar-ring: #0E7490;
 
   --radius: 0.5rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Dark palette — teal-on-slate, activated by next-themes via
+   <html class="dark"> when the user toggles or system prefers dark.
+   ───────────────────────────────────────────────────────────── */
+.dark {
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: #1E293B;
+  --card-foreground: #F1F5F9;
+  --popover: #1E293B;
+  --popover-foreground: #F1F5F9;
+
+  --primary: #22D3EE;
+  --primary-foreground: #0F172A;
+
+  --secondary: #1E293B;
+  --secondary-foreground: #F1F5F9;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #164E63;
+  --accent-foreground: #67E8F9;
+
+  --destructive: #EF4444;
+
+  --border: #334155;
+  --input: #334155;
+  --ring: #22D3EE;
+
+  --sidebar: #1E293B;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #22D3EE;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #164E63;
+  --sidebar-accent-foreground: #67E8F9;
+  --sidebar-border: #334155;
+  --sidebar-ring: #22D3EE;
 }
