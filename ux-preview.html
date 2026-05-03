@@ -555,8 +555,8 @@
           </tbody>
         </table>
       </div>
-      <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="del-title">
-        <div class="bg-card rounded-2xl shadow-lift max-w-md w-full mx-4 overflow-hidden">
+      <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="del-title" data-close-dialog="doctors-list">
+        <div class="bg-card rounded-2xl shadow-lift max-w-md w-full mx-4 overflow-hidden" onclick="event.stopPropagation()">
           <div class="p-6">
             <div class="flex items-start gap-4">
               <div class="w-10 h-10 rounded-full bg-destructive-soft text-destructive flex items-center justify-center shrink-0">
@@ -575,7 +575,7 @@
             </div>
           </div>
           <div class="bg-muted/40 px-6 py-4 flex justify-start gap-3 border-t border-line">
-            <button type="button" class="btn btn-outline">סגור</button>
+            <button type="button" class="btn btn-outline" data-close-dialog="doctors-list">סגור</button>
             <button type="button" class="btn btn-destructive" disabled style="opacity:0.4;cursor:not-allowed;">מחק רופא</button>
           </div>
         </div>
@@ -645,6 +645,22 @@
         e.preventDefault();
         showScreen(link.dataset.nav);
       });
+    });
+
+    // Delegated dialog-close: works even after replaceChildren swaps the DOM
+    document.addEventListener('click', function (e) {
+      var target = e.target.closest('[data-close-dialog]');
+      if (!target) return;
+      e.preventDefault();
+      showScreen(target.dataset.closeDialog);
+    });
+
+    // Escape key closes any visible dialog overlay back to its origin screen
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var overlay = document.querySelector('[role="dialog"][data-close-dialog]');
+      if (!overlay) return;
+      showScreen(overlay.dataset.closeDialog);
     });
 
     showScreen('dashboard');
