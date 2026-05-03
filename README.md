@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# מערכת ניהול מרפאה — Ono Clinic MVP
 
-## Getting Started
+פרויקט גמר בקורס **ניהול ועיצוב בסיסי נתונים**, המכללה האקדמית אונו.
 
-First, run the development server:
+**Live demo:** [ono-clinic-mvp.vercel.app](https://ono-clinic-mvp.vercel.app)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## תיאור הפרויקט
+
+אפליקציית ניהול מרפאה מלאה הכוללת ניהול רופאים, מטופלים ותורים. ממשק בעברית, כיוון RTL מלא, ועיצוב רספונסיבי.
+
+### פיצ'רים עיקריים
+
+| מודול | פעולות |
+|---|---|
+| **רופאים** | הוספה, עריכה, מחיקה (חסומה אם יש תורים) |
+| **מטופלים** | הוספה, עריכה, מחיקה (חסומה אם יש תורים) |
+| **תורים** | קביעה, עריכה, מחיקה עם **זיהוי התנגשות 30 דקות** |
+| **לוח בקרה** | ספירות + 5 תורים קרובים |
+
+---
+
+## ארכיטקטורה טכנית
+
+```
+Next.js 16 (App Router)
+├── Server Components         ← ריצה ב-server, ללא JavaScript בצד לקוח
+├── Server Actions            ← mutations ישירות ל-DB, ללא API REST
+├── React Hook Form + Zod 4   ← ולידציה client + server
+└── Prisma 6 + Neon Postgres  ← ORM + PostgreSQL ב-cloud
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### מבנה הפרויקט
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/
+│   ├── (clinic)/              # Route group — shell + sidebar
+│   │   ├── dashboard/         # לוח בקרה
+│   │   ├── doctors/           # רופאים (list + new + [license]/edit)
+│   │   ├── patients/          # מטופלים (list + new + [id]/edit)
+│   │   └── appointments/      # תורים (list + new + [id]/edit)
+│   └── layout.tsx             # Root layout: RTL + Heebo + ThemeProvider
+├── components/
+│   └── layout/                # ClinicShell, AppHeader, AppSidebar, ThemeToggle
+└── lib/
+    ├── schemas/               # Zod schemas (doctor, patient, appointment)
+    ├── validators.ts          # תעודת זהות, רישיון, טלפון ישראלי
+    └── action-helpers.ts      # validate() utility
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## בסיס הנתונים
 
-To learn more about Next.js, take a look at the following resources:
+### ישויות
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Doctor** — רישיון רופא ישראלי (5 ספרות), שם
+**Patient** — תעודת זהות (9 ספרות + ספרת ביקורת), שם, טלפון ישראלי
+**Appointment** — FK ל-Doctor + Patient, תאריך (timestamptz), סיבה
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### אילוצים
 
-## Deploy on Vercel
+- `ON DELETE RESTRICT` על שני FKs של Appointment — אי אפשר למחוק רופא/מטופל עם תורים
+- אינדקס מורכב `(doctor_license, appointment_date)` — מאיץ בדיקת התנגשות
+- ולידציה ספרת ביקורת (לוחנית) ב-application layer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## התקנה מקומית
+
+```bash
+# Clone
+git clone https://github.com/belhassen-raphael99/ono-clinic-mvp.git
+cd ono-clinic-mvp
+
+# Install
+pnpm install
+
+# Environment variables (.env.local)
+DATABASE_URL="postgresql://..."   # Neon connection pooling URL
+DIRECT_URL="postgresql://..."     # Neon direct URL (for migrations)
+
+# Generate Prisma client + push schema
+pnpm prisma generate
+pnpm prisma db push
+
+# Seed with sample data
+pnpm prisma db seed
+
+# Start dev server
+pnpm dev
+```
+
+פתח [http://localhost:3000](http://localhost:3000) בדפדפן.
+
+---
+
+## סטאק טכנולוגי
+
+| כלי | גרסה | שימוש |
+|---|---|---|
+| Next.js | 16 | App Router, Server Actions |
+| React | 19 | UI framework |
+| TypeScript | 5 | Type safety (strict mode) |
+| Tailwind CSS | 4 | Styling |
+| Prisma | 6 | ORM |
+| Neon | — | Serverless Postgres |
+| Zod | 4 | Schema validation |
+| React Hook Form | 7 | Form state management |
+| shadcn/ui (Base UI) | — | Component library |
+| Sonner | — | Toast notifications |
+| next-themes | — | Dark/light mode |
+| Heebo | — | Google Fonts (Hebrew) |
+
+---
+
+## Scripts
+
+```bash
+pnpm dev          # dev server with Turbopack
+pnpm build        # production build
+pnpm test         # unit tests (Vitest)
+pnpm lint         # ESLint
+pnpm prisma studio  # visual DB browser
+```
+
+---
+
+*פרויקט גמר — המכללה האקדמית אונו, 2025*
