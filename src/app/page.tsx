@@ -5,8 +5,6 @@ import { prisma } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-export const fetchCache = "force-no-store";
 
 async function getStats() {
   try {
@@ -15,16 +13,15 @@ async function getStats() {
       prisma.patient.count(),
       prisma.appointment.count(),
     ]);
-    return { doctorCount, patientCount, appointmentCount, debugError: null as string | null };
+    return { doctorCount, patientCount, appointmentCount };
   } catch (e) {
-    const msg = e instanceof Error ? `${e.name}: ${e.message}` : String(e);
     console.error("[WelcomePage.getStats]", e);
-    return { doctorCount: 0, patientCount: 0, appointmentCount: 0, debugError: msg };
+    return { doctorCount: 0, patientCount: 0, appointmentCount: 0 };
   }
 }
 
 export default async function WelcomePage() {
-  const { doctorCount, patientCount, appointmentCount, debugError } = await getStats();
+  const { doctorCount, patientCount, appointmentCount } = await getStats();
 
   const features = [
     {
@@ -90,12 +87,6 @@ export default async function WelcomePage() {
             קבע תור חדש
           </Link>
         </div>
-
-        {debugError && (
-          <div className="mt-8 max-w-2xl mx-auto rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-xs text-destructive font-mono text-start" dir="ltr">
-            <strong>DEBUG (will remove): </strong>{debugError}
-          </div>
-        )}
 
         {/* Live stats */}
         <div className="mt-14 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
