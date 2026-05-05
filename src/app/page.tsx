@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Stethoscope, Users, CalendarDays, Activity, ArrowLeft, Heart } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { prisma } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
@@ -50,14 +49,13 @@ export default async function WelcomePage() {
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Top bar */}
       <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center">
           <div className="flex items-center gap-2">
             <span className="rounded-lg bg-primary/10 p-1.5 text-primary">
               <Heart className="h-4 w-4" />
             </span>
             <span className="font-semibold">מרפאת אונו</span>
           </div>
-          <ThemeToggle />
         </div>
       </header>
 
@@ -69,9 +67,7 @@ export default async function WelcomePage() {
         </span>
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
           ברוכים הבאים<br />
-          <span className="bg-gradient-to-l from-primary to-primary/60 bg-clip-text text-transparent">
-            למרפאת אונו
-          </span>
+          <span className="text-primary">למרפאת אונו</span>
         </h1>
         <p className="mt-6 text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           מערכת מודרנית לניהול רופאים, מטופלים ותורים. עיצוב נקי, ממשק בעברית, וביצועים מהירים — הכל במקום אחד.
