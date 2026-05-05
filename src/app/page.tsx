@@ -1,9 +1,28 @@
 import Link from "next/link";
 import { Stethoscope, Users, CalendarDays, Activity, ArrowLeft, Heart } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { prisma } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
-export default function WelcomePage() {
+export const dynamic = "force-dynamic";
+
+async function getStats() {
+  try {
+    const [doctorCount, patientCount, appointmentCount] = await Promise.all([
+      prisma.doctor.count(),
+      prisma.patient.count(),
+      prisma.appointment.count(),
+    ]);
+    return { doctorCount, patientCount, appointmentCount };
+  } catch (e) {
+    console.error("[WelcomePage.getStats]", e);
+    return { doctorCount: 0, patientCount: 0, appointmentCount: 0 };
+  }
+}
+
+export default async function WelcomePage() {
+  const { doctorCount, patientCount, appointmentCount } = await getStats();
+
   const features = [
     {
       icon: Stethoscope,
@@ -67,6 +86,20 @@ export default function WelcomePage() {
           <Link href="/appointments/new" className={cn(buttonVariants({ size: "lg", variant: "outline" }))}>
             קבע תור חדש
           </Link>
+        </div>
+
+        {/* Live stats */}
+        <div className="mt-14 grid grid-cols-3 gap-4 max-w-2xl mx-auto">
+          {[
+            { label: "רופאים", value: doctorCount },
+            { label: "מטופלים", value: patientCount },
+            { label: "תורים", value: appointmentCount },
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-xl border border-border bg-card px-4 py-5 shadow-card">
+              <p className="text-3xl font-bold">{value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
