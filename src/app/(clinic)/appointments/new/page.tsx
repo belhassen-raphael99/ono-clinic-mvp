@@ -3,6 +3,8 @@ import { ChevronRight } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { AppointmentForm } from "./appointment-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function NewAppointmentPage() {
   const [doctors, patients] = await Promise.all([
     prisma.doctor.findMany({ select: { licenseNumber: true, name: true }, orderBy: { name: "asc" } }),
